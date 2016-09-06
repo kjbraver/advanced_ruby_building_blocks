@@ -1,4 +1,9 @@
+#can only accept numerical values
 def bubble_sort(unsorted)
+	bubble_sort_by(unsorted) {|first, second| second - first}
+end
+
+def bubble_sort_by(unsorted)
 	#validate unsorted is an array
 	error = "Wrong Argument Error: This function accepts an array of unsorted objects as input."
 	return error unless unsorted.is_a?(Array)
@@ -16,11 +21,10 @@ def bubble_sort(unsorted)
 		
 		#compare each value to next value until a full pass is completed with no out of place elements
 		scope_of_scan.times do |index|
-			if(copy[index] > copy[index + 1])
+			#will trigger if the yeild block results in a positive number
+			if(yield(copy[index], copy[index + 1])) > 0
 				sorted = false
-				temp = copy[index]
-				copy[index] = copy[index + 1]
-				copy[index + 1] = temp
+				copy[index], copy[index+1] = copy[index+1], copy[index]
 			end
 		end
 
@@ -31,4 +35,7 @@ def bubble_sort(unsorted)
 	return copy
 end
 
-p bubble_sort([4,3,78,2,0,2])
+#testing
+p (bubble_sort_by(["hi","hello","hey"]) do |left,right|
+	left.length - right.length 
+end)
