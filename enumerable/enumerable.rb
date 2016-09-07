@@ -55,12 +55,37 @@ module Enumerable
 		return count 
 	end
 
-	def my_map
+	def my_map(instructions=nil)
 		mapped = []
 		self.my_each do |value|
-			mapped << yield(value)
+			mapped << yield(value) if instructions.nil?
+			mapped << instructions.call(value) if !instructions.nil?
 		end
 		return mapped
 	end
 
+	def my_inject(initial=nil, instructions=nil) 
+		data = self.to_a
+		total = 0
+			if(initial.nil?)
+				total = data[0]
+				if(instructions.nil?) 
+					data.drop(1).my_each {|value| total = yield(total, value)} 
+				else
+					data.drop(1).my_each {|value| total = instructions.call(total, value)}
+				end
+			else
+				total = initial
+				if(instructions.nil?) 
+					data.my_each {|value| total = yield(total, value)} 
+				else
+					data.my_each {|value| total = instructions.call(total, value)}
+				end
+			end
+		return total
+	end
+end
+
+def multiply_els(numbers)
+	numbers.my_inject(1) {|product, num| product * num}
 end
